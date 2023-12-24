@@ -60,13 +60,18 @@ class Board:
             return
         return cell_x, cell_y
 
-    def on_click(self, cell):
-        self.board[cell[1]][cell[0]] = (self.board[cell[1]][cell[0]] + 1) % 2
+    def on_click(self, cell, drawing=False, erase=False):
+        if drawing:
+            self.board[cell[1]][cell[0]] = 1
+        elif erase:
+            self.board[cell[1]][cell[0]] = 0
+        # else:
+        #     self.board[cell[1]][cell[0]] = (self.board[cell[1]][cell[0]] + 1) % 2
 
-    def get_click(self, mouse_pos):
+    def get_click(self, mouse_pos, drawing=False, erase=False):
         cell = self.get_cell(mouse_pos)
         if cell:
-            self.on_click(cell)
+            self.on_click(cell, drawing, erase)
 
 
 def main():
@@ -87,13 +92,12 @@ def main():
 
     running = True
     play = False
+    drawing = False
+    erase = False
     while running:
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 running = False
-
-            if event.type == pygame.MOUSEBUTTONDOWN:
-                board.get_click(event.pos)
 
             if event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_SPACE:
@@ -105,6 +109,27 @@ def main():
                     play = False
                     board.board = copy.deepcopy(default)
 
+            if event.type == pygame.MOUSEBUTTONDOWN:
+                if event.button == 1:
+                    drawing = True
+                    board.get_click(event.pos, drawing)
+                elif event.button == 3:
+                    erase = True
+                    board.get_click(event.pos, erase=erase)
+            if event.type == pygame.MOUSEBUTTONUP:
+                if event.button == 1:
+                    drawing = False
+                elif event.button == 3:
+                    erase = False
+            if event.type == pygame.MOUSEMOTION:
+                if drawing:
+                    x, y = event.pos
+                    if 0 <= x <= 1000 and 0 <= y <= 1000:
+                        board.get_click(event.pos, drawing)
+                elif erase:
+                    x, y = event.pos
+                    if 0 <= x <= 1000 and 0 <= y <= 1000:
+                        board.get_click(event.pos, erase=erase)
         if play:
             pygame.display.set_caption('Play')
             fps = 10
