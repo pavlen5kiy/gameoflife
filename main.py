@@ -65,8 +65,6 @@ class Board:
             self.board[cell[1]][cell[0]] = 1
         elif erase:
             self.board[cell[1]][cell[0]] = 0
-        # else:
-        #     self.board[cell[1]][cell[0]] = (self.board[cell[1]][cell[0]] + 1) % 2
 
     def get_click(self, mouse_pos, drawing=False, erase=False):
         cell = self.get_cell(mouse_pos)
