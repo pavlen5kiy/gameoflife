@@ -21,7 +21,8 @@ class Board:
     def __init__(self, width, height):
         self.width = width
         self.height = height
-        self.board = np.zeros(width * height, dtype=np.uint8).reshape(width, height)
+        self.board = np.zeros(width * height, dtype=np.uint8).reshape(height,
+                                                                      width)
 
         self.left = 10
         self.top = 10
@@ -56,10 +57,11 @@ class Board:
         cell_x = (mouse_pos[0] - self.left) // self.cell_size
         cell_y = (mouse_pos[1] - self.top) // self.cell_size
         if cell_x < 0 or cell_x >= self.width or \
-                cell_y < 0 or cell_x >= self.height:
+                cell_y < 0 or cell_y >= self.height:
             return
         return cell_x, cell_y
 
+    # TODO: Add brush size.
     def on_click(self, cell, drawing=False, erase=False):
         if drawing:
             self.board[cell[1]][cell[0]] = 1
@@ -73,17 +75,25 @@ class Board:
 
 
 def main():
-    clock = pygame.time.Clock()
     pygame.init()
-    size = 1001, 1002
-    screen = pygame.display.set_mode(size)
+
+    # pygame.mixer.music.load('Electrodynam.mp3')
+    # pygame.mixer.music.set_volume(1)
+    # pygame.mixer.music.play(-1)
+    # pygame.mixer.music.pause()
+
+    clock = pygame.time.Clock()
+
+    info = pygame.display.Info()
+    size = info.current_w, info.current_h
+    screen = pygame.display.set_mode(size, pygame.FULLSCREEN)
 
     pygame.display.set_caption('Pause')
 
-    width, height = 40, 40
+    cell_size = 10
+    width, height = size[0] // cell_size, size[1] // cell_size
     board = Board(width, height)
-    default = np.zeros(width * height, dtype=np.uint8).reshape(width, height)
-    cell_size = 25
+    default = np.zeros(width * height, dtype=np.uint8).reshape(height, width)
     left = 0
     top = 1
     board.set_view(left, top, cell_size)
@@ -106,6 +116,9 @@ def main():
                 if event.key == pygame.K_r:
                     play = False
                     board.board = copy.deepcopy(default)
+                if event.key == pygame.K_q:
+                    running = False
+                    break
 
             if event.type == pygame.MOUSEBUTTONDOWN:
                 if event.button == 1:
@@ -122,18 +135,20 @@ def main():
             if event.type == pygame.MOUSEMOTION:
                 if drawing:
                     x, y = event.pos
-                    if 0 <= x <= 1000 and 0 <= y <= 1000:
+                    if 0 <= x <= size[0] - 1 and 0 <= y <= size[1] - 1:
                         board.get_click(event.pos, drawing)
                 elif erase:
                     x, y = event.pos
-                    if 0 <= x <= 1000 and 0 <= y <= 1000:
+                    if 0 <= x <= size[0] - 1 and 0 <= y <= size[1] - 1:
                         board.get_click(event.pos, erase=erase)
         if play:
             pygame.display.set_caption('Play')
+            # pygame.mixer.music.unpause()
             fps = 10
         else:
             pygame.display.set_caption('Pause')
-            fps = 60
+            # pygame.mixer.music.pause()
+            fps = 240
         clock.tick(fps)
 
         screen.fill((0, 0, 0))
