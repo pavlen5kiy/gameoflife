@@ -83,7 +83,7 @@ async def main():
     info = pygame.display.Info()
     # size = info.current_w, info.current_h
     size = 1920, 1080
-    screen = pygame.display.set_mode(size)
+    screen = pygame.display.set_mode(size, pygame.DOUBLEBUF)
 
     pygame.display.set_caption('Game of Life')
 
