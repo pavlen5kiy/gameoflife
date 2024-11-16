@@ -113,6 +113,11 @@ async def main():
                 if event.key == pygame.K_r:
                     play = False
                     board.board = copy.deepcopy(default)
+
+                if event.key == pygame.K_F1:
+                    play = False
+                    board.board = np.random.randint(0, 2, (height, width))
+
                 # if event.key == pygame.K_q:
                 #     running = False
                 #     break
