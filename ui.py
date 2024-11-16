@@ -8,27 +8,23 @@ class Sprite(pygame.sprite.Sprite):
 
 
 class Button(Sprite):
-    def __init__(self, screen, screen_size, image, highlighted, pos=(0, 0),
+    def __init__(self, screen, screen_size, image, pos=(0, 0),
                  *group):
         super().__init__(*group)
         self.image = load_image(image)
         self.rect = self.image.get_rect()
         self.orig = load_image(image)
-        self.rect.centerx = pos[0]
-        self.rect.centery = pos[1]
+        self.rect.topleft = pos
         self.orig_pos = pos
-        self.highlighted = load_image(highlighted)
+        self.hl = load_image(image + '_hl')
         self.screen = screen
-        self.hidden_msg_font = pygame.font.Font(
-            'assets/fonts/PixelOperator8-Bold.ttf',
-            15)
 
     def update(self, *args):
         mouse_pos = pygame.mouse.get_pos()
         if self.rect.x <= mouse_pos[
             0] <= self.rect.x + self.orig.get_width() and self.rect.y <= \
                 mouse_pos[1] <= self.rect.y + self.orig.get_height():
-            self.image = self.highlighted
+            self.image = self.hl
         else:
             self.image = self.orig
 
@@ -38,20 +34,10 @@ class Button(Sprite):
 
         return False
 
-    def draw_hint(self):
-        hint = 'sigmo'
-        hint_render = self.hidden_msg_font.render(hint,
-                                                  True,
-                                                  'white')
-        pygame.draw.rect(self.screen, pygame.Color('black'),
-                         pygame.Rect(
-                             pygame.mouse.get_pos()[0] + 14 - 70,
-                             pygame.mouse.get_pos()[1] + 14,
-                             hint_render.get_width() + 8,
-                             hint_render.get_height() + 8))
-        self.screen.blit(hint_render, (
-            pygame.mouse.get_pos()[0] + 14 + 4 - 70,
-            pygame.mouse.get_pos()[1] + 14 + 4))
+    def change_image(self, image):
+        self.image = load_image(image)
+        self.orig = load_image(image)
+        self.hl = load_image(image + '_hl')
 
 
 class Ui:

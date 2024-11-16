@@ -5,7 +5,7 @@ import numpy as np
 import pygame
 import time
 
-from ui import Text
+from ui import Text, Button
 from board import Board
 
 
@@ -36,7 +36,13 @@ async def main():
 
     last_time = time.time()
 
-    brush_size_text = Text(screen, size, 50, pos=(30, 30), center_align=True)
+    w, h = size
+
+    brush_size_text = Text(screen, size, 50, pos=(w - 30, 30), center_align=True)
+
+    buttons_g = pygame.sprite.Group()
+
+    play_button = Button(screen, size, 'play', (10, 10), buttons_g)
 
     mouse_wheel_cd = 0
 
@@ -65,6 +71,14 @@ async def main():
                     play = False
                     board.board = np.random.randint(0, 2, (height, width))
 
+            if play_button.update(event):
+                if not play:
+                    play_button.change_image('pause')
+                    play = True
+                else:
+                    play_button.change_image('play')
+                    play = False
+
             try:
                 if event.type == pygame.MOUSEWHEEL:
                     if mouse_wheel_cd >= 5:
@@ -79,8 +93,6 @@ async def main():
                                 brush_size = 1
 
                 if event.type == pygame.MOUSEBUTTONDOWN:
-                    play = False
-
                     if event.button == 1:
                         drawing = True
                         board.get_click(event.pos, drawing=drawing, brush_size=brush_size)
@@ -89,8 +101,6 @@ async def main():
                         board.get_click(event.pos, erase=erase, brush_size=brush_size)
 
                 if event.type == pygame.MOUSEBUTTONUP:
-                    play = False
-
                     if event.button == 1:
                         drawing = False
                     elif event.button == 3:
@@ -118,6 +128,8 @@ async def main():
 
         board.update(screen, play)
         brush_size_text.update(brush_size)
+
+        buttons_g.draw(screen)
 
         pygame.display.flip()
 
