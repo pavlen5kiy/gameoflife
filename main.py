@@ -71,13 +71,13 @@ async def main():
                     play = False
                     board.board = np.random.randint(0, 2, (height, width))
 
-            if play_button.update(event):
-                if not play:
-                    play_button.change_image('pause')
-                    play = True
-                else:
-                    play_button.change_image('play')
-                    play = False
+            # if play_button.update(event):
+            #     if not play:
+            #         play_button.change_image('pause')
+            #         play = True
+            #     else:
+            #         play_button.change_image('play')
+            #         play = False
 
             try:
                 if event.type == pygame.MOUSEWHEEL:
@@ -129,7 +129,7 @@ async def main():
         board.update(screen, play)
         brush_size_text.update(brush_size)
 
-        buttons_g.draw(screen)
+        # buttons_g.draw(screen)
 
         pygame.display.flip()
 
