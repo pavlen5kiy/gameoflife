@@ -70,15 +70,16 @@ class Board:
                 self.board[cell[1] - i][cell[0]] = 1
                 self.board[cell[1]][cell[0] - i] = 1
 
-                self.board[cell[1] + i][cell[0] + 1] = 1
-                self.board[cell[1] + 1][cell[0] + i] = 1
-                self.board[cell[1] - i][cell[0] - 1] = 1
-                self.board[cell[1] - 1][cell[0] - i] = 1
+                for j in range(brush_size - 1):
+                    self.board[cell[1] + i][cell[0] + j] = 1
+                    self.board[cell[1] + j][cell[0] + i] = 1
+                    self.board[cell[1] - i][cell[0] - j] = 1
+                    self.board[cell[1] - j][cell[0] - i] = 1
 
-                self.board[cell[1] + i][cell[0] - 1] = 1
-                self.board[cell[1] - 1][cell[0] + i] = 1
-                self.board[cell[1] - i][cell[0] + 1] = 1
-                self.board[cell[1] + 1][cell[0] - i] = 1
+                    self.board[cell[1] + i][cell[0] - j] = 1
+                    self.board[cell[1] - j][cell[0] + i] = 1
+                    self.board[cell[1] - i][cell[0] + j] = 1
+                    self.board[cell[1] + j][cell[0] - i] = 1
 
                 self.board[cell[1] + i][cell[0] + i] = 1
                 self.board[cell[1] - i][cell[0] - i] = 1
@@ -95,15 +96,16 @@ class Board:
                 self.board[cell[1] - i][cell[0]] = 0
                 self.board[cell[1]][cell[0] - i] = 0
 
-                self.board[cell[1] + i][cell[0] + 1] = 0
-                self.board[cell[1] + 1][cell[0] + i] = 0
-                self.board[cell[1] - i][cell[0] - 1] = 0
-                self.board[cell[1] - 1][cell[0] - i] = 0
+                for j in range(brush_size - 1):
+                    self.board[cell[1] + i][cell[0] + j] = 0
+                    self.board[cell[1] + j][cell[0] + i] = 0
+                    self.board[cell[1] - i][cell[0] - j] = 0
+                    self.board[cell[1] - j][cell[0] - i] = 0
 
-                self.board[cell[1] + i][cell[0] - 1] = 0
-                self.board[cell[1] - 1][cell[0] + i] = 0
-                self.board[cell[1] - i][cell[0] + 1] = 0
-                self.board[cell[1] + 1][cell[0] - i] = 0
+                    self.board[cell[1] + i][cell[0] - j] = 0
+                    self.board[cell[1] - j][cell[0] + i] = 0
+                    self.board[cell[1] - i][cell[0] + j] = 0
+                    self.board[cell[1] + j][cell[0] - i] = 0
 
                 self.board[cell[1] + i][cell[0] + i] = 0
                 self.board[cell[1] - i][cell[0] - i] = 0

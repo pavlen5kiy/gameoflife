@@ -40,7 +40,7 @@ async def main():
 
     mouse_wheel_cd = 0
 
-    brush_size = 0
+    brush_size = 1
 
     while running:
         dt = time.time() - last_time
@@ -75,8 +75,8 @@ async def main():
                                 brush_size = 10
                         else:
                             brush_size -= 1
-                            if brush_size < 0:
-                                brush_size = 0
+                            if brush_size < 1:
+                                brush_size = 1
 
                 if event.type == pygame.MOUSEBUTTONDOWN:
                     play = False
