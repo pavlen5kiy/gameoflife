@@ -3,6 +3,7 @@ import copy
 
 import numpy as np
 import pygame
+import time
 
 
 def next_population(population):
@@ -63,16 +64,60 @@ class Board:
             return
         return cell_x, cell_y
 
-    def on_click(self, cell, drawing=False, erase=False):
+    def on_click(self, cell, drawing=False, erase=False, brush_size=1):
         if drawing:
             self.board[cell[1]][cell[0]] = 1
+
+            for i in range(brush_size):
+                self.board[cell[1] + i][cell[0]] = 1
+                self.board[cell[1]][cell[0] + i] = 1
+                self.board[cell[1] - i][cell[0]] = 1
+                self.board[cell[1]][cell[0] - i] = 1
+
+                self.board[cell[1] + i][cell[0] + 1] = 1
+                self.board[cell[1] + 1][cell[0] + i] = 1
+                self.board[cell[1] - i][cell[0] - 1] = 1
+                self.board[cell[1] - 1][cell[0] - i] = 1
+
+                self.board[cell[1] + i][cell[0] - 1] = 1
+                self.board[cell[1] - 1][cell[0] + i] = 1
+                self.board[cell[1] - i][cell[0] + 1] = 1
+                self.board[cell[1] + 1][cell[0] - i] = 1
+
+                self.board[cell[1] + i][cell[0] + i] = 1
+                self.board[cell[1] - i][cell[0] - i] = 1
+                self.board[cell[1] + i][cell[0] - i] = 1
+                self.board[cell[1] - i][cell[0] + i] = 1
+
+
         elif erase:
             self.board[cell[1]][cell[0]] = 0
 
-    def get_click(self, mouse_pos, drawing=False, erase=False):
+            for i in range(brush_size):
+                self.board[cell[1] + i][cell[0]] = 0
+                self.board[cell[1]][cell[0] + i] = 0
+                self.board[cell[1] - i][cell[0]] = 0
+                self.board[cell[1]][cell[0] - i] = 0
+
+                self.board[cell[1] + i][cell[0] + 1] = 0
+                self.board[cell[1] + 1][cell[0] + i] = 0
+                self.board[cell[1] - i][cell[0] - 1] = 0
+                self.board[cell[1] - 1][cell[0] - i] = 0
+
+                self.board[cell[1] + i][cell[0] - 1] = 0
+                self.board[cell[1] - 1][cell[0] + i] = 0
+                self.board[cell[1] - i][cell[0] + 1] = 0
+                self.board[cell[1] + 1][cell[0] - i] = 0
+
+                self.board[cell[1] + i][cell[0] + i] = 0
+                self.board[cell[1] - i][cell[0] - i] = 0
+                self.board[cell[1] + i][cell[0] - i] = 0
+                self.board[cell[1] - i][cell[0] + i] = 0
+
+    def get_click(self, mouse_pos, drawing=False, erase=False, brush_size=1):
         cell = self.get_cell(mouse_pos)
         if cell:
-            self.on_click(cell, drawing, erase)
+            self.on_click(cell, drawing, erase, brush_size)
 
 
 async def main():
@@ -99,17 +144,28 @@ async def main():
     play = False
     drawing = False
     erase = False
+
+    last_time = time.time()
+
+    mouse_wheel_cd = 0
+
+    brush_size = 0
+
     while running:
+        dt = time.time() - last_time
+        dt *= 60
+        last_time = time.time()
+
+        mouse_wheel_cd += dt
+
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 running = False
 
             if event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_SPACE:
-                    if play:
-                        play = False
-                    else:
-                        play = True
+                    play = not play
+
                 if event.key == pygame.K_r:
                     play = False
                     board.board = copy.deepcopy(default)
@@ -118,31 +174,47 @@ async def main():
                     play = False
                     board.board = np.random.randint(0, 2, (height, width))
 
-                # if event.key == pygame.K_q:
-                #     running = False
-                #     break
+            try:
+                if event.type == pygame.MOUSEWHEEL:
+                    if mouse_wheel_cd >= 1:
+                        mouse_wheel_cd = 0
+                        if event.y == -1:
+                            brush_size += 1
+                            if brush_size < 0:
+                                brush_size = 0
+                        else:
+                            brush_size -= 1
 
-            if event.type == pygame.MOUSEBUTTONDOWN:
-                if event.button == 1:
-                    drawing = True
-                    board.get_click(event.pos, drawing)
-                elif event.button == 3:
-                    erase = True
-                    board.get_click(event.pos, erase=erase)
-            if event.type == pygame.MOUSEBUTTONUP:
-                if event.button == 1:
-                    drawing = False
-                elif event.button == 3:
-                    erase = False
-            if event.type == pygame.MOUSEMOTION:
-                if drawing:
-                    x, y = event.pos
-                    if 0 <= x <= size[0] - 1 and 0 <= y <= size[1] - 1:
-                        board.get_click(event.pos, drawing)
-                elif erase:
-                    x, y = event.pos
-                    if 0 <= x <= size[0] - 1 and 0 <= y <= size[1] - 1:
-                        board.get_click(event.pos, erase=erase)
+                if event.type == pygame.MOUSEBUTTONDOWN:
+                    play = False
+
+                    if event.button == 1:
+                        drawing = True
+                        board.get_click(event.pos, drawing=drawing, brush_size=brush_size)
+                    elif event.button == 3:
+                        erase = True
+                        board.get_click(event.pos, erase=erase, brush_size=brush_size)
+
+                if event.type == pygame.MOUSEBUTTONUP:
+                    play = False
+
+                    if event.button == 1:
+                        drawing = False
+                    elif event.button == 3:
+                        erase = False
+
+                if event.type == pygame.MOUSEMOTION:
+                    if drawing:
+                        x, y = event.pos
+                        if 0 <= x <= size[0] - 1 and 0 <= y <= size[1] - 1:
+                            board.get_click(event.pos, drawing=drawing, brush_size=brush_size)
+                    elif erase:
+                        x, y = event.pos
+                        if 0 <= x <= size[0] - 1 and 0 <= y <= size[1] - 1:
+                            board.get_click(event.pos, erase=erase, brush_size=brush_size)
+            except Exception as e:
+                pass
+
         if play:
             fps = 10
         else:
